@@ -297,6 +297,43 @@ The PCA implementation uses only NumPy with the following algorithm:
 
 **Validation**: Tested against scikit-learn's PCA with tolerance of 1e-10
 
+#### Detailed Implementation Method: `fit(X)`
+
+Fits PCA on data using **ONLY NumPy operations**.
+
+**Mathematical Steps:**
+1. **Center the data** - Subtract mean from all samples: `X_centered = X - X.mean(axis=0)`
+2. **Compute covariance matrix** - Calculate feature covariances: `cov_matrix = (X_centered.T @ X_centered) / (n_samples - 1)`
+3. **Compute eigenvalues and eigenvectors** - Use eigendecomposition: `eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)`
+4. **Sort by eigenvalues** - Order components by explained variance (descending order): `sorted_indices = np.argsort(eigenvalues)[::-1]`
+5. **Select top n_components eigenvectors** - Keep only the top k components: `top_eigenvectors = eigenvectors[:, sorted_indices[:n_components]]`
+6. **Calculate explained variance ratio** - Determine how much variance each component explains: `explained_variance_ratio = eigenvalues[sorted_indices[:n_components]] / eigenvalues.sum()`
+
+**Method Signature:**
+```python
+def fit(self, X: np.ndarray) -> 'PCA_NumPy':
+    """
+    Fit PCA on data using ONLY NumPy operations.
+
+    Args:
+        X: Input data of shape (n_samples, n_features)
+
+    Returns:
+        self (for method chaining)
+
+    Raises:
+        ValueError: If X has invalid shape
+        ValueError: If n_components >= n_features
+    """
+```
+
+**Key Features:**
+- Pure NumPy implementation with no external ML libraries
+- Efficient linear algebra operations using matrix decomposition
+- Preserves mathematical accuracy with validation against scikit-learn (tolerance: 1e-10)
+- Provides explained variance ratio for each principal component
+- Supports method chaining for pipeline integration
+
 ### Clustering Metrics
 
 - **Inertia**: Sum of squared distances from each point to its nearest cluster center (within-cluster sum of squares)
